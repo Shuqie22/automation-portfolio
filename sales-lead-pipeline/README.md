@@ -2,7 +2,7 @@
 
 ## What This Project Does
 
-This workflow automatically captures, scores, and manages sales leads without any manual work. When a potential client fills out a contact form, the entire process of recording their details, scoring their inquiry with AI, adding them to a CRM, and notifying the sales team happens in under 10 seconds — completely automatically.
+This workflow automatically captures, scores, and manages sales leads without any manual work. When a potential client fills out a contact form, the entire process of recording their details, scoring their inquiry with AI, adding them to a CRM, and notifying the sales team happens in under 10 seconds - completely automatically.
 
 ## The Problem It Solves
 
