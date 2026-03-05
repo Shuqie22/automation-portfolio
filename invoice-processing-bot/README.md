@@ -2,7 +2,7 @@
 
 ## What This Project Does
 
-This workflow automatically detects invoice emails in Gmail, uses AI to extract the key financial details, and logs everything into both a Notion database and Google Sheets — sending budget alerts when invoices exceed a set threshold. No manual data entry, no missed invoices, no spreadsheet updating by hand.
+This workflow automatically detects invoice emails in Gmail, uses AI to extract the key financial details, and logs everything into both a Notion database and Google Sheets - sending budget alerts when invoices exceed a set threshold. No manual data entry, no missed invoices, no spreadsheet updating by hand.
 
 ## The Problem It Solves
 
