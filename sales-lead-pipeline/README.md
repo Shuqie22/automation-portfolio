@@ -16,12 +16,12 @@ A potential client submits a Google Form with their name, email, company name, a
 
 All tools in this project use free tiers only, making it accessible to any business without upfront cost.
 
-- **n8n** (self-hosted, free) — the automation engine that connects everything together
-- **Google Forms** (free) — the lead capture form that triggers the pipeline
-- **Google Gemini API** (free tier) — the AI that scores and categorises each lead
-- **HubSpot CRM** (free tier) — where contacts are stored and managed
-- **Google Sheets** (free) — the master log of all leads and their scores
-- **Gmail** (free) — sends the notification email to the sales team
+- **n8n** (self-hosted, free) : the automation engine that connects everything together
+- **Google Forms** (free) : the lead capture form that triggers the pipeline
+- **Google Gemini API** (free tier) : the AI that scores and categorises each lead
+- **HubSpot CRM** (free tier) : where contacts are stored and managed
+- **Google Sheets** (free) : the master log of all leads and their scores
+- **Gmail** (free) : sends the notification email to the sales team
 
 ## Workflow Structure
 
