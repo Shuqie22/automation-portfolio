@@ -28,8 +28,7 @@ All tools in this project use free tiers only, making it accessible to any busin
 The workflow runs in this exact order. The Webhook node listens for Google Form submissions and receives the lead data. The HTTP Request node sends the lead details to Gemini AI for scoring. The Code node parses the AI response and extracts the structured fields. The HubSpot node creates or updates the contact in the CRM. The Google Sheets node logs everything to the spreadsheet. The Gmail node sends the notification email. The Respond to Webhook node sends a success response back to the form so the submitter sees a confirmation.
 
 ## Screenshot
-
-![Workflow Screenshot](https://github.com/user-attachments/assets/a5c466f8-d724-4830-8cbf-5e0a6ba6dc2a)
+![Workflow Screenshot](https://github.com/user-attachments/assets/fa5752f4-a349-431f-8ddc-f898bf399431)
 
 ## How to Set It Up
 
