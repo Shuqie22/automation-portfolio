@@ -1,4 +1,4 @@
-# Automation Portfolio -- Sukurah Yusuf
+# Automation Portfolio 
 
 Built by Sukurah Yusuf | sukurahomotola@gmail.com
 
