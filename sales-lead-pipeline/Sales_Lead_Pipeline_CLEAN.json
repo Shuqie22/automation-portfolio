@@ -1,0 +1,187 @@
+{
+  "name": "Sales Lead Automation Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sales-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-960, 208],
+      "id": "6955a9a7-1a18-44aa-a2a6-1cfa1f3bd213",
+      "name": "Receive Lead Form",
+      "webhookId": "sales-lead-webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "YOUR_GEMINI_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"You are a sales lead scoring assistant. Score this lead from 1 to 10 and categorize them as Hot, Warm, or Cold based on their inquiry. Return ONLY a JSON object with these fields: score (number), category (string: Hot/Warm/Cold), reason (one sentence), suggested_action (one sentence).\\n\\nLead Details:\\nName: {{ $json.body.name }}\\nEmail: {{ $json.body.email }}\\nCompany: {{ $json.body.company }}\\nInquiry: {{ $json.body.inquiry }}\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [-720, 208],
+      "id": "14cb6f5a-9b75-467c-9808-ef619ad2c454",
+      "name": "Score Lead with Gemini"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.item.json.candidates[0].content.parts[0].text;\nconst clean = raw.replace(/```json/gi, '').replace(/```/g, '').trim();\nconst parsed = JSON.parse(clean);\nconst lead = $('Receive Lead Form').item.json.body;\n\nreturn [{\n  json: {\n    name: lead.name.trim(),\n    email: lead.email.trim(),\n    company: lead.company ? lead.company.trim() : '',\n    inquiry: lead.inquiry.trim(),\n    score: parsed.score,\n    category: parsed.category,\n    reason: parsed.reason,\n    suggested_action: parsed.suggested_action\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-480, 208],
+      "id": "10b531bd-ff13-45f0-8c42-fc86d915129d",
+      "name": "Parse Gemini Response"
+    },
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "email": "={{ $json.email }}",
+        "additionalFields": {
+          "companyName": "={{ $json.company }}",
+          "firstName": "={{ $json.name.split(' ')[0] }}",
+          "lastName": "={{ $json.name.split(' ').slice(1).join(' ') }}",
+          "leadStatus": "={{ $json.category === 'Hot' ? 'IN_PROGRESS' : $json.category === 'Warm' ? 'OPEN' : 'UNQUALIFIED' }}",
+          "message": "=Lead Score: {{ $json.score }}/10 | Category: {{ $json.category }} | Reason: {{ $json.reason }}"
+        },
+        "options": {
+          "resolveData": false
+        }
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [-240, 208],
+      "id": "03b5bd8b-f025-4644-b4c8-edee746d496e",
+      "name": "Create or update a contact",
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "YOUR_HUBSPOT_CREDENTIAL_ID",
+          "name": "HubSpot App Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.toFormat('yyyy-MM-dd HH:mm') }}",
+            "Name": "={{ $('Parse Gemini Response').item.json.name }}",
+            "Email": "={{ $('Parse Gemini Response').item.json.email }}",
+            "Company": "={{ $('Parse Gemini Response').item.json.company }}",
+            "Inquiry": "={{ $('Parse Gemini Response').item.json.inquiry }}",
+            "Score": "={{ $('Parse Gemini Response').item.json.score }}",
+            "Category": "={{ $('Parse Gemini Response').item.json.category }}",
+            "Reason": "={{ $('Parse Gemini Response').item.json.reason }}",
+            "Suggested Action": "={{ $('Parse Gemini Response').item.json.suggested_action }}"
+          },
+          "matchingColumns": ["Email"],
+          "schema": [
+            {"id": "Date", "displayName": "Date", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Name", "displayName": "Name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Email", "displayName": "Email", "required": false, "defaultMatch": true, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Company", "displayName": "Company", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Inquiry", "displayName": "Inquiry", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Score", "displayName": "Score", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Category", "displayName": "Category", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Reason", "displayName": "Reason", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Suggested Action", "displayName": "Suggested Action", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [0, 208],
+      "id": "a376e3a3-c974-43e0-935e-15f304703087",
+      "name": "Log to Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "YOUR_EMAIL@gmail.com",
+        "subject": "=New {{ $('Parse Gemini Response').item.json.category }} Lead: {{ $('Parse Gemini Response').item.json.name }}",
+        "message": "=<h2>New Lead Alert</h2>\n<p><strong>Name:</strong> {{ $('Parse Gemini Response').item.json.name }}</p>\n<p><strong>Email:</strong> {{ $('Parse Gemini Response').item.json.email }}</p>\n<p><strong>Company:</strong> {{ $('Parse Gemini Response').item.json.company }}</p>\n<p><strong>Inquiry:</strong> {{ $('Parse Gemini Response').item.json.inquiry }}</p>\n<hr>\n<h3>AI Lead Score: {{ $('Parse Gemini Response').item.json.score }}/10 — {{ $('Parse Gemini Response').item.json.category }}</h3>\n<p><strong>Reason:</strong> {{ $('Parse Gemini Response').item.json.reason }}</p>\n<p><strong>Suggested Action:</strong> {{ $('Parse Gemini Response').item.json.suggested_action }}</p>\n<p>Contact has been added to HubSpot CRM automatically.</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [0, 400],
+      "id": "d3ba9af4-b82f-4f18-be87-8d0f3665f293",
+      "name": "Send Gmail Notification",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Lead received successfully. Thank you!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [0, 0],
+      "id": "7b3c1d5d-7f0c-4ab8-a614-5217053c7ec2",
+      "name": "Respond to Form"
+    }
+  ],
+  "connections": {
+    "Receive Lead Form": {
+      "main": [[{"node": "Score Lead with Gemini", "type": "main", "index": 0}]]
+    },
+    "Score Lead with Gemini": {
+      "main": [[{"node": "Parse Gemini Response", "type": "main", "index": 0}]]
+    },
+    "Parse Gemini Response": {
+      "main": [[
+        {"node": "Respond to Form", "type": "main", "index": 0},
+        {"node": "Create or update a contact", "type": "main", "index": 0}
+      ]]
+    },
+    "Create or update a contact": {
+      "main": [[
+        {"node": "Log to Google Sheets", "type": "main", "index": 0},
+        {"node": "Send Gmail Notification", "type": "main", "index": 0}
+      ]]
+    }
+  },
+  "meta": {
+    "instanceId": "REPLACE_WITH_YOUR_INSTANCE_ID"
+  }
+}
