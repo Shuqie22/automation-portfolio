@@ -22,6 +22,16 @@ Tools used: Make.com, Gmail, Google Gemini API, Notion, Google Sheets
 
 [View Project](./invoice-processing-bot)
 
+
+### 3. YouTube True Crime Channel Automation
+A fully automated YouTube content pipeline that produces complete videos from a single topic input. The system generates a 20-scene AI script, creates and animates images for each scene, produces voiceovers, merges everything into a full video with captions and background music, and uploads it directly to YouTube with SEO-optimized titles, tags, and thumbnails.
+
+Tools used: n8n, NCA Toolkit, ElevenLabs, OpenAI, ffmpeg, YouTube Data API v3
+
+Built in collaboration with Quyum Yusuf.
+
+[View Project](https://github.com/Shuqie22/youtube-automation-pipeline)
+
 ## Skills Demonstrated
 
 - Workflow automation with n8n and Make.com
